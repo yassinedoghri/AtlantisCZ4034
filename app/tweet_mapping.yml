@@ -1,0 +1,245 @@
+#################################
+# Tweet mapping for elasticsearch
+#################################
+
+tweets-index:
+  mappings:
+    tweet:
+      properties:
+        $oid:
+          type: "string"
+        id_str:
+          type: "string"
+        id:
+          type: "integer"
+        text:
+          type: "string"
+        search_query:
+          type: "string"
+        source:
+          type: "string"
+        favorited:
+          type: "boolean"
+        favorite_count:
+          type: "integer"
+        retweet_count:
+          type: "integer"
+        retweeted:
+          type: "boolean"
+        possibly_sensitive:
+          type: "boolean"
+        in_reply_to_user_id:
+          type: "integer"
+        in_reply_to_user_id_str:
+          type: "string"
+        in_reply_to_status_id:
+          type: "integer"
+        in_reply_to_status_id_str:
+          type: "string"
+        in_reply_to_screen_name:
+          type: "string"
+        created_at:
+          type: "date"
+        truncated:
+          type: "boolean"
+        is_quote_status:
+          type: "boolean"
+        retweet_count:
+          type: "integer"
+        lang:
+          type: "string"
+        contributors:
+          type: "string"
+        metadata:
+          result_type:
+            type: "string"
+          iso_language_code:
+            type: "string"
+        geo:
+          type: "object"
+          properties:
+            type:
+              type: "string"
+            coordinates:
+              type: "geo_point"
+        coordinates:
+          type: "object"
+          properties:
+            type:
+              type: "string"
+            coordinates:
+              type: "geo_point"
+        entities:
+          type: "object"
+          properties:
+            symbols:
+              type: "string"
+              index_name : "symbol"
+            hashtags:
+              type: "string"
+              index_name: "hashtag"
+            user_mentions:
+              properties:
+                  id:
+                    type: "integer"
+                  id_str :
+                    type: "string"
+                  screen_name :
+                    type: "string"
+                  name :
+                    type: "string"
+                  indices":
+                    type: "integer"
+                    index_name: "index"
+            urls:
+              properties:
+                url:
+                  type: "string"
+                expanded_url:
+                  type: "string"
+                display_url:
+                  type: "string"
+                indices:
+                  type: "string"
+                  index_name: "index"
+        user:
+          type: "object"
+          properties:
+            friends_count:
+              type: "integer"
+            followers_count:
+              type: "integer"
+            utc_offset:
+              type: "integer"
+            profile_banner_url:
+              type: "string"
+            statuses_count:
+              type: "integer"
+            following:
+              type: "boolean"
+            contributors_enabled:
+              type: "boolean"
+            default_profile:
+              type: "boolean"
+            profile_background_tile:
+              type: "boolean"
+            created_at:
+              type: "date"
+            profile_image_url_https:
+              type: "string"
+            id_str:
+              type: "string"
+            verified:
+              type: "boolean"
+            is_translator:
+              type: "boolean"
+            listed_count:
+              type: "integer"
+            notifications:
+              type: "boolean"
+            favourites_count:
+              type: "integer"
+            is_translation_enabled:
+              type: "boolean"
+            translator_type:
+              type: "string"
+            profile_use_background_image:
+              type: "boolean"
+            has_extended_profile:
+              type: "boolean"
+            url:
+              type: "string"
+            profile_background_color:
+              type: "string"
+            location:
+              type: "string"
+            time_zone:
+              type: "string"
+            default_profile_image:
+              type: "boolean"
+            profile_link_color:
+              type: "string"
+            profile_background_image_url_https:
+              type: "string"
+            protected:
+              type: "boolean"
+            profile_sidebar_fill_color:
+              type: "string"
+            name:
+              type: "string"
+            profile_text_color:
+              type: "string"
+            id:
+              type: "integer"
+            follow_request_sent:
+              type: "boolean"
+            lang:
+              type: "string"
+            profile_sidebar_border_color:
+              type: "string"
+            profile_background_image_url:
+              type: "string"
+            profile_image_url:
+              type: "string"
+            entities:
+              type: "object"
+              url:
+                type: "object"
+                urls:
+                  properties:
+                    url:
+                      type: "string"
+                    expanded_url:
+                      type: "string"
+                    display_url:
+                      type: "string"
+                    indices:
+                      type: "string"
+                      index_name: "index"
+              description:
+                type: "object"
+                urls:
+                  properties:
+                    url:
+                      type: "string"
+                    expanded_url:
+                      type: "string"
+                    display_url:
+                      type: "string"
+                    indices:
+                      type: "string"
+                      index_name: "index"
+            screen_name:
+              type: "string"
+            geo_enabled:
+              type: "boolean"
+            description:
+              type: "string"
+        place:
+          type: "object"
+          properties:
+          attributes":
+            type: "object"
+          id:
+            type: "string"
+          url:
+            type: "string"
+          country:
+            type: "string"
+          full_name:
+            type: "string"
+          place_type:
+            type: "string"
+          bounding_box:
+            type: "object"
+            properties:
+              type:
+                type: "string"
+              coordinates:
+                type: "geo_point"
+          contained_within:
+            type: "string"
+          country_code:
+            type: "string"
+          name:
+            type: "string"

@@ -1,0 +1,157 @@
+{
+  "_id": "58e12fd16b8163e61d2b4b2d",
+  "id": 848258560786124801,
+  "text": "@RealKyleMorris @dodt2003 @mschlapp We want jobs ,ins., lower taxes, controlled immigration. Stop supporting freelo… https://t.co/SkIw76uKXi",
+  "search_query": "trump immigration",
+  "place": {
+    "attributes": {
+    },
+    "id": "6057f1e35bcc6c20",
+    "url": "https://api.twitter.com/1.1/geo/id/6057f1e35bcc6c20.json",
+    "country": "United States",
+    "full_name": "South Carolina, USA",
+    "place_type": "admin",
+    "bounding_box": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -83.353955,
+            32.04683
+          ],
+          [
+            -78.499301,
+            32.04683
+          ],
+          [
+            -78.499301,
+            35.215449
+          ],
+          [
+            -83.353955,
+            35.215449
+          ]
+        ]
+      ]
+    },
+    "contained_within": [],
+    "country_code": "US",
+    "name": "South Carolina"
+  },
+  "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>",
+  "favorite_count": 0,
+  "created_at": "2017-04-01T19:39:35Z",
+  "metadata": {
+    "result_type": "recent",
+    "iso_language_code": "en"
+  },
+  "id_str": "848258560786124801",
+  "favorited": false,
+  "in_reply_to_user_id": 129571843,
+  "in_reply_to_status_id_str": "847979208924160001",
+  "in_reply_to_screen_name": "RealKyleMorris",
+  "retweeted": false,
+  "in_reply_to_user_id_str": "129571843",
+  "geo": null,
+  "in_reply_to_status_id": 847979208924160001,
+  "entities": {
+    "symbols": [],
+    "urls": [
+      {
+        "url": "https://t.co/SkIw76uKXi",
+        "expanded_url": "https://twitter.com/i/web/status/848258560786124801",
+        "display_url": "twitter.com/i/web/status/8…",
+        "indices": [
+          117,
+          140
+        ]
+      }
+    ],
+    "hashtags": [],
+    "user_mentions": [
+      {
+        "id": 129571843,
+        "indices": [
+          0,
+          15
+        ],
+        "id_str": "129571843",
+        "screen_name": "RealKyleMorris",
+        "name": "Kyle Morris"
+      },
+      {
+        "id": 205909943,
+        "indices": [
+          16,
+          25
+        ],
+        "id_str": "205909943",
+        "screen_name": "dodt2003",
+        "name": "Tim Vickers"
+      },
+      {
+        "id": 138809881,
+        "indices": [
+          26,
+          35
+        ],
+        "id_str": "138809881",
+        "screen_name": "mschlapp",
+        "name": "Matt Schlapp"
+      }
+    ]
+  },
+  "contributors": null,
+  "coordinates": null,
+  "user": {
+    "friends_count": 73,
+    "followers_count": 34,
+    "utc_offset": null,
+    "statuses_count": 1259,
+    "following": false,
+    "contributors_enabled": false,
+    "default_profile": true,
+    "profile_background_tile": false,
+    "created_at": "Thu Feb 02 17:37:20 +0000 2017",
+    "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png",
+    "id_str": "827209300095414273",
+    "verified": false,
+    "is_translator": false,
+    "listed_count": 0,
+    "notifications": false,
+    "favourites_count": 2504,
+    "is_translation_enabled": false,
+    "translator_type": "none",
+    "profile_use_background_image": true,
+    "has_extended_profile": false,
+    "url": null,
+    "profile_background_color": "F5F8FA",
+    "location": "",
+    "time_zone": null,
+    "default_profile_image": true,
+    "profile_link_color": "1DA1F2",
+    "profile_background_image_url_https": null,
+    "protected": false,
+    "profile_sidebar_fill_color": "DDEEF6",
+    "name": "sharon collins",
+    "profile_text_color": "333333",
+    "id": 827209300095414273,
+    "follow_request_sent": false,
+    "lang": "en",
+    "profile_sidebar_border_color": "C0DEED",
+    "profile_background_image_url": null,
+    "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png",
+    "entities": {
+      "description": {
+        "urls": []
+      }
+    },
+    "screen_name": "sharonc58264930",
+    "geo_enabled": true,
+    "description": ""
+  },
+  "truncated": true,
+  "is_quote_status": false,
+  "retweet_count": 0,
+  "lang": "en"
+}

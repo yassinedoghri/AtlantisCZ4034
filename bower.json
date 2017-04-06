@@ -1,0 +1,11 @@
+{
+  "name": "app",
+  "dependencies": {
+    "jQuery": "^3.2.1",
+    "materialize": "^0.98.1",
+    "font-awesome": "^4.7.0",
+    "moment": "^2.18.1",
+    "masonry": "^4.1.1",
+    "jscroll": "^2.3.7"
+  }
+}

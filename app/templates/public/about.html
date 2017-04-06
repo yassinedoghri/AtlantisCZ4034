@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block header %}
+<div class="section no-pad-bot">
+    <div class="container">
+        <br><br>
+        <h1 class="header center light-blue-text text-lighten-2">Sarcasm Detection</h1>
+        <div class="row center">
+            <h5 class="header col s12 light">A web app that aims to detect sarcasm in Govt. planning and decision
+                (Trump's immigration order) tweets</h5>
+        </div>
+        <div class="row center">
+            <a href="{{ url_for('public.home') }}"
+               class="btn-large waves-effect waves-light light-blue lighten-1">Get Started</a>
+        </div>
+        <br><br>
+    </div>
+</div>
+<div class="parallax"><img src="{{ url_for('static', filename = 'img/background4.jpg') }}"
+                           alt="Abstract background"></div>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="section">
+        <div class="row">
+            <div class="col s12 m4">
+                <h1>About</h1>
+                <p>This project was developed by <a href="http://github.com/yassinedoghri/">Yassine Doghri</a>.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,163 @@
+{% extends "layout.html" %}
+
+{% block sidebar %}
+<div class="section no-pad-bot">
+    <div class="container">
+        <br><br>
+        <div class="row center">
+            <h5 class="header col s12 light">Search for a topic regarding Donald Trump's Govt. planning and
+                decisions</h5>
+        </div>
+        <form id="search-form" class="col s12" action="#" method="GET">
+            <div class="row center">
+                <div class="input-field">
+                    <input id="search" type="search" name="q" value="{{ request.args.get('q', '') }}"
+                           placeholder="immigration, obamacare, etc.">
+                    <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+                    <i class="material-icons search-icon-close">close</i>
+                </div>
+            </div>
+            <br><br>
+            <div class="card card-panel grey lighten-5 z-depth-1">
+                <div class="card-content">
+                    <span class="card-title blue-grey-text text-darken-4"><i class="material-icons">settings</i> Filters</span>
+                    <div class="switch">
+                        <div class="input-field col s12">
+                            <label>
+                                Sarcasm Off
+                                <input type="checkbox" name="sarcasm" value="{{ request.args.get('sarcasm') }}">
+                                <span class="lever"></span>
+                                Sarcasm On
+                            </label>
+                        </div>
+                        <br><br><br>
+                    </div>
+                    <div class="input-field col s12">
+                        <input id="date-tweets-from" name="tweets-from"
+                               value="{{ request.args.get('tweets-from') }}" type="date" class="datepicker">
+                        <label for="date-tweets-from">Tweets from</label>
+                    </div>
+                    <div class="input-field col s12">
+                        <input id="date-tweets-to" name="tweets-to" value="{{ request.args.get('tweets-to') }}"
+                               type="date" class="datepicker">
+                        <label for="date-tweets-to">Tweets To</label>
+                    </div>
+                    <button type="submit" class="waves-effect waves-light btn">Submit</button>
+                </div>
+            </div>
+        </form>
+        <!--<div class="card card-panel grey lighten-5 z-depth-1 clearfix">-->
+        <!--<div class="card-content">-->
+        <!--<span class="card-title blue-grey-text text-darken-4"><i-->
+        <!--class="material-icons"></i> Quick Search</span>-->
+        <!--<div class="collection">-->
+        <!--<a href="#!" class="collection-item">Immigration</a>-->
+        <!--<a href="#!" class="collection-item">Obamacare</a>-->
+        <!--<a href="#!" class="collection-item">Wall</a>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</div>-->
+    </div>
+</div>
+<div class="parallax"><img src="{{ url_for('static', filename = 'img/background4.jpg') }}"
+                           alt="Abstract background"></div>
+{% endblock %}
+
+
+{% block content %}
+<div class="section">
+    <div class="row">
+        <div class="col s12">
+            <div class="search-data">
+                <p class="flow-text">
+                    <span class="right"><small>Page <strong>{{ curr_page }}</strong> out of <strong>{{ number_of_pages }}</strong></small></span>
+                    <small>
+                        <strong>{{ number_of_docs }}</strong> tweets out of
+                        <strong>{{ "{:,}".format(tweets['hits']['total']) }}</strong> retrieved
+                        ({{ tweets['took'] * 0.001 }} seconds)
+                    </small>
+                </p>
+            </div>
+            <div class="grid">
+                <div class="grid-sizer"></div>
+                {% for tweet in tweets['hits']['hits'] %}
+                <div class="col s12 m6 grid-item">
+                    <div class="card card-panel grey lighten-5 z-depth-1">
+                        <div class="row valign-wrapper">
+                            <div class="col s1">
+                                <img src="{{ tweet._source.user.profile_image_url }}" alt="User profile Image"
+                                     class="circle responsive-img">
+                                <!-- notice the "circle" class -->
+                            </div>
+                            <div class="col s10">
+                                <p class="right">{{ tweet._source.created_at }}</p>
+                                <h5>{{ tweet._source.user.name }}
+                                    <small>@{{ tweet._source.user.screen_name }}</small>
+                                </h5>
+                                <p>{{ tweet._source.text|urlize(40, target='_blank') }}</p>
+                                <div class="card-action">
+                                    <a href="#" class="tooltipped" data-position="bottom" data-delay="50"
+                                       data-tooltip="Retweets"><i class="material-icons">repeat</i>{{
+                                        tweet._source.retweet_count }}</a>
+                                    <a href="#" class="tooltipped" data-position="bottom" data-delay="50"
+                                       data-tooltip="Favorites"><i class="material-icons">star</i>{{
+                                        tweet._source.favorite_count }}</a>
+                                    <a href="#" class="right tooltipped" data-position="bottom" data-delay="50"
+                                       data-tooltip="Score"><i class="material-icons">equalizer</i>{{
+                                        tweet._score }}</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% if number_of_pages > 1 %}
+            <div class="col s12">
+                <ul class="pagination center">
+                    {% if curr_page != 1 %}
+                    <li class="waves-effect"><a href="{{ modify_query(page=prev_page) }}"><i
+                            class="material-icons">chevron_left</i></a></li>
+                    {% else %}
+                    <li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
+                    {% endif %}
+
+                    {% for page in page_list %}
+                    {% if page.num == '' %}
+                    <li class="disabled">...</li>
+                    {% else %}
+                    <li class="{{ page.class }}"><a href="{{ modify_query(page=page.num) }}">{{ page.num }}</a></li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if curr_page != number_of_pages %}
+                    <li class="waves-effect"><a href="{{ modify_query(page=next_page) }}"><i
+                            class="material-icons">chevron_right</i></a></li>
+                    {% else %}
+                    <li class="disabled"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    $(document).ready(function () {
+        Materialize.updateTextFields();
+    });
+
+    $('.tooltipped').tooltip();
+
+    $('.grid').masonry({
+        columnWidth: '.grid-sizer',
+        itemSelector: '.grid-item',
+        percentPosition: true
+    });
+
+
+</script>
+{% endblock %}
