@@ -1,0 +1,76 @@
+{
+  "size": 10,
+  "aggregations": {
+    "sentiment_over_time": {
+      "aggs": {
+        "count_by_sentiment": {
+          "terms": {
+            "field": "leading_sentiment"
+          }
+        }
+      },
+      "date_histogram": {
+        "interval": "day",
+        "format": "dd-MM-yyyy",
+        "field": "created_at"
+      }
+    },
+    "sentiments": {
+      "terms": {
+        "field": "leading_sentiment"
+      }
+    }
+  },
+  "from": 0,
+  "query": {
+    "function_score": {
+      "score_mode": "multiply",
+      "boost_mode": "multiply",
+      "filter": {
+        "bool": {
+          "must": {
+            "terms": {
+              "leading_sentiment": [
+                "neg",
+                "pos"
+              ]
+            },
+            "range": {
+              "created_at": {
+                "lte": "now",
+                "gte": "04-04-2017",
+                "format": "dd-MM-yyyy||yyyy"
+              }
+            }
+          }
+        }
+      },
+      "functions": [
+        {
+          "field_value_factor": {
+            "missing": 1,
+            "factor": 0.0001,
+            "modifier": "log1p",
+            "field": "retweet_count"
+          }
+        },
+        {
+          "field_value_factor": {
+            "missing": 1,
+            "factor": 0.0001,
+            "modifier": "log1p",
+            "field": "favorite_count"
+          }
+        }
+      ],
+      "query": {
+        "query_string": {
+          "fields": [
+            "text^2"
+          ],
+          "query": "obamacare"
+        }
+      }
+    }
+  }
+}

@@ -1493,4 +1493,4 @@ var originWidth=origin.outerWidth();var originHeight=origin.outerHeight();var or
 if(options=='open'){calculateTapTarget();openTapTarget();}
 if(options=='close')
 closeTapTarget();});},open:function(){},close:function(){}};$.fn.tapTarget=function(methodOrOptions){if(methods[methodOrOptions]||typeof methodOrOptions==='object')
-return methods.init.apply(this,arguments);$.error('Method '+methodOrOptions+' does not exist on jQuery.tap-target');};}(jQuery));(function($,window){$(".button-collapse").sideNav();$('.parallax').parallax();$('.datepicker').pickadate({selectMonths:true,selectYears:15});Materialize.showStaggeredList('#staggered')}).call(this,jQuery,window);
+return methods.init.apply(this,arguments);$.error('Method '+methodOrOptions+' does not exist on jQuery.tap-target');};}(jQuery));(function($,window){$(".button-collapse").sideNav();$('.parallax').parallax();Materialize.showStaggeredList('#staggered');$('.modal').modal();}).call(this,jQuery,window);

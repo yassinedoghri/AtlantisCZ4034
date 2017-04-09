@@ -1,0 +1,53 @@
+{% for tweet in tweets['hits']['hits'] %}
+{% if tweet._source.leading_sentiment == "pos" %}
+{% set sentiment = "Positive" %}
+{% elif tweet._source.leading_sentiment == "neu" %}
+{% set sentiment = "Neutral" %}
+{% else %}
+{% set sentiment = "Negative" %}
+{% endif %}
+<div class="col s12 m6 grid-item">
+    <div class="card card-panel grey lighten-5 z-depth-1">
+        <div class="row valign-wrapper">
+            <div class="col s2 center">
+                <img src="{{ tweet._source.user.profile_image_url }}" alt="User profile Image"
+                     class="circle responsive-img">
+                <!-- notice the "circle" class -->
+            </div>
+            <div class="col s10">
+                <p class="right">
+                    <a href="#" data-position="top" data-delay="50"
+                       data-tooltip="{{ tweet._source.created_at|datestring_fmt(2) }}"
+                       class="tooltipped">{{ tweet._source.created_at|datestring_fmt }}</a>
+                </p>
+                <h5>
+                    {% if tweet._source.user.verified %}
+                    <span class="user-name">{{ tweet._source.user.name }}
+                    <a href="#" class="tooltipped verified-user" data-position="bottom" data-delay="50"
+                       data-tooltip="Verified"><i class="material-icons">done</i></a>
+                    </span>
+                    {% else %}
+                    <span>{{ tweet._source.user.name }}</span>
+                    {% endif %}
+                    <small>@{{ tweet._source.user.screen_name }}</small>
+                </h5>
+                <p>{{ tweet._source.text|urlize(40, target='_blank') }}</p>
+                <div class="card-action">
+                    <a href="#" class="tooltipped" data-position="bottom" data-delay="50"
+                       data-tooltip="Retweets"><i class="material-icons">repeat</i>{{
+                        tweet._source.retweet_count }}</a>
+                    <a href="#" class="tooltipped" data-position="bottom" data-delay="50"
+                       data-tooltip="Favorites"><i class="material-icons">star</i>{{
+                        tweet._source.favorite_count }}</a>
+                    <a href="#" class="right tooltipped" data-position="bottom" data-delay="50"
+                       data-tooltip="Score"><i class="material-icons">equalizer</i>{{
+                        tweet._score|round(3, 'ceil') }}</a>
+                    <a href="#" class="right tooltipped" data-position="bottom" data-delay="50"
+                       data-tooltip="{{sentiment}} Tweet">
+                        <i class="material-icons {{tweet._source.leading_sentiment}}">track_changes</i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}

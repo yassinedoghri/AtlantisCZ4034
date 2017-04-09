@@ -41,8 +41,11 @@
 {% assets "js_all" %}
 <script type="text/javascript" src="{{ ASSET_URL }}"></script>
 {% endassets %}
+<script type="text/javascript" src="{{ url_for('static', filename='libs/jquery-infinite-scroll/jquery.infinitescroll.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='libs/masonry/dist/masonry.pkgd.min.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='libs/jscroll/jquery.jscroll.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='libs/imagesloaded/imagesloaded.pkgd.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='libs/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='libs/chart.js/dist/Chart.bundle.js') }}"></script>
 {% block js %}{% endblock %}
 <!-- end scripts -->
 {% endblock %}

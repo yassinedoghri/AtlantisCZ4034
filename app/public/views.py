@@ -22,25 +22,122 @@ tweets_collection.ensure_index([('retweeted', pymongo.ASCENDING)])
 @blueprint.route('/', methods=['GET', 'POST'])
 def home():
     """Home page."""
-    page = int(request.args.get('page', default=1))
-    size = int(request.args.get('size', default=10))
+    page = int(check_param('page', default=1))
+    size = int(check_param('size', default=10))
+    date_from = check_param('tweets_from', default='')
+    date_to = check_param('tweets_to', default='')
+    sentiment = {
+        'neg': int(check_param('neg', default=0)),
+        'neu': int(check_param('neu', default=0)),
+        'pos': int(check_param('pos', default=0))
+    }
     previous_page = page - 1
     next_page = page + 1
-    query = None
-    if request.method == 'GET':
-        query = request.args.get('q')
+    query = check_param('q', default='')
     # perform search
-    res = es_search(query, page, size)
+    res = es_search(query, page, size, date_from, date_to, sentiment)
     number_of_pages = math.ceil(res['hits']['total'] / size)
     number_of_docs = len(res['hits']['hits'])
-    return render_template('public/index.html',
+    sentiments_data = parse_buckets(res['aggregations']['sentiments']['buckets'])
+    sentiment_over_time = parse_sentiment_over_time(res['aggregations']['sentiment_over_time']['buckets'])
+    return render_template(
+        'public/index.html',
+        tweets=res,
+        query=query,
+        prev_page=previous_page,
+        curr_page=page,
+        next_page=next_page,
+        number_of_pages=number_of_pages,
+        page_list=get_pages(page, number_of_pages),
+        number_of_docs=number_of_docs,
+        tweets_from=date_from,
+        tweets_to=date_to,
+        sentiment=sentiment,
+        sentiments_data=sentiments_data,
+        sentiment_over_time=sentiment_over_time
+    )
+
+
+def check_param(name, default):
+    param = request.args.get(name)
+    return param if param else default
+
+
+def parse_buckets(bucket_list):
+    bucket_dict = {}
+    for bucket in bucket_list:
+        bucket_dict[bucket['key']] = bucket['doc_count']
+    return bucket_dict
+
+
+def parse_sentiment_over_time(bucket_list):
+    labels = []
+    line_dataset = []
+    bar_dataset = []
+    neg_data = []
+    neu_data = []
+    pos_data = []
+    for bucket in bucket_list:
+        labels.append(bucket['key_as_string'])
+        line_dataset.append(bucket['doc_count'])
+        neg_data.append(get_sentiment_count(bucket, 'neg'))
+        neu_data.append(get_sentiment_count(bucket, 'neu'))
+        pos_data.append(get_sentiment_count(bucket, 'pos'))
+    bar_dataset = [
+        {
+            "label": "Negative",
+            "backgroundColor": "#FF6384",
+            "data": neg_data,
+            "stack": 1
+        },
+        {
+            "label": "Positive",
+            "backgroundColor": "#36A2EB",
+            "data": pos_data,
+            "stack": 1
+        },
+        {
+            "label": "Neutral",
+            "backgroundColor": "#CCCCCC",
+            "data": neu_data,
+            "stack": 1
+        }
+    ]
+    data = {
+        'labels': labels,
+        'datasets': bar_dataset
+    }
+    print(data)
+    return data
+
+
+def get_sentiment_count(bucket_list, key=''):
+    for bucket in bucket_list['count_by_sentiment']['buckets']:
+        if bucket['key'] == key:
+            return bucket['doc_count']
+    return 0
+
+
+@blueprint.route('/tweet_search/', methods=['GET', 'POST'])
+def tweet_search():
+    """Tweet Search page."""
+    page = int(check_param('page', default=1))
+    size = int(check_param('size', default=10))
+    date_from = check_param('tweets_from', default='')
+    date_to = check_param('tweets_to', default='')
+    sentiment = {
+        'neg': int(check_param('neg', default=0)),
+        'neu': int(check_param('neu', default=0)),
+        'pos': int(check_param('pos', default=0))
+    }
+    next_page = page + 1
+    query = check_param('q', default='')
+    # perform search
+    res = es_search(query, page, size, date_from, date_to, sentiment)
+    return render_template('public/tweet_search.html',
                            tweets=res,
-                           prev_page=previous_page,
-                           curr_page=page,
-                           next_page=next_page,
-                           number_of_pages=number_of_pages,
-                           page_list=get_pages(page, number_of_pages),
-                           number_of_docs=number_of_docs)
+                           query=query,
+                           next_page=next_page)
 
 
 @blueprint.route('/about/')
@@ -49,7 +146,7 @@ def about():
     return render_template('public/about.html')
 
 
-def es_search(query=None, page=1, size=10):
+def es_search(query=None, page=1, size=10, date_from=None, date_to=None, sentiment=None):
     es_query = {
         "query": {
             "function_score": {
@@ -61,33 +158,70 @@ def es_search(query=None, page=1, size=10):
                         "field_value_factor": {
                             "field": "retweet_count",
                             "missing": 1,
-                            "factor": 0.00001
-                        },
-                        "weight": 10
+                            "factor": 0.0001,
+                            "modifier": "log1p"
+                        }
                     },
                     {
                         "field_value_factor": {
                             "field": "favorite_count",
                             "missing": 1,
-                            "factor": 0.00001
-                        },
-                        "weight": 10
+                            "factor": 0.0001,
+                            "modifier": "log1p"
+                        }
                     }
                 ],
                 "boost_mode": "multiply",
-                "score_mode": "multiply"
+                "score_mode": "multiply",
+                "filter": {"bool": {"must": []}},
+            }
+        },
+        "from": (page - 1) * size,
+        "size": size,
+        "aggregations": {
+            "sentiments": {
+                "terms": {"field": "leading_sentiment"}
+            },
+            "sentiment_over_time": {
+                "date_histogram": {
+                    "field": "created_at",
+                    "interval": "day",
+                    "format": "dd-MM-yyyy"
+                },
+                "aggs": {
+                    "count_by_sentiment": {
+                        "terms": {
+                            "field": "leading_sentiment"
+                        }
+                    }
+                }
             }
         }
     }
-    if query is not None:
+    if query:
         es_query['query']['function_score']['query'] = {
             "query_string": {
                 "query": query,
-                "fields": ["text"]
+                "fields": ["text^2"]
             }
         }
-    es_query["from"] = (page - 1) * size
-    es_query["size"] = size
+    if date_from or date_to:
+        date_filter = {
+            "range": {
+                "created_at": {
+                    "lte": date_to if date_to else "now",
+                    "format": "dd-MM-yyyy||yyyy"
+                }
+            }
+        }
+        if date_from:
+            date_filter["range"]["created_at"]["gte"] = date_from
+        es_query['query']["function_score"]["filter"]["bool"]["must"].append(date_filter)
+    if any(v > 0 for k, v in sentiment.items()):
+        sentiment_filter = {
+            "terms": {"leading_sentiment": [k for k, v in sentiment.items() if v > 0]}
+        }
+        es_query['query']["function_score"]["filter"]["bool"]["must"].append(sentiment_filter)
     print(es_query)
     res = es.search(index="tweets", body=es_query)
     print(res)

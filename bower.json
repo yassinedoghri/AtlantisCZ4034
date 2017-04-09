@@ -6,6 +6,9 @@
     "font-awesome": "^4.7.0",
     "moment": "^2.18.1",
     "masonry": "^4.1.1",
-    "jscroll": "^2.3.7"
+    "jquery-infinite-scroll": "infinite-scroll#^2.1.0",
+    "imagesloaded": "^4.1.1",
+    "jquery.inputmask": "^3.3.4",
+    "chart.js": "^2.5.0"
   }
 }

@@ -14,7 +14,30 @@ tweets-index:
           type: "integer"
         text:
           type: "string"
-        search_query:
+        text_tokenized:
+          type: "string"
+          index_name: "text_token"
+        text_tokenized_nsw:
+          type: "string"
+          index_name: "text_token_nsw"
+        text_tokenized_np:
+          type: "string"
+          index_name: "text_token_np"
+        text_lemmatized:
+          type: "string"
+          index_name: "text_lemmatize"
+        sentiment:
+          type: "object"
+          properties:
+            compound:
+              type: "float"
+            neg:
+              type: "float"
+            neu:
+              type: "float"
+            pos:
+              type: "float"
+        leading_sentiment:
           type: "string"
         source:
           type: "string"
@@ -40,6 +63,7 @@ tweets-index:
           type: "string"
         created_at:
           type: "date"
+          format: "date_time"
         truncated:
           type: "boolean"
         is_quote_status:

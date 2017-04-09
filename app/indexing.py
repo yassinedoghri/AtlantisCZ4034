@@ -1,24 +1,28 @@
 # -*- coding: utf-8 -*-
+import pprint
+
 import pymongo
-from elasticsearch import Elasticsearch, helpers
-from bson.json_util import dumps
 import yaml
+from elasticsearch import Elasticsearch, helpers
+from tqdm import tqdm
+
+pp = pprint.PrettyPrinter(indent=4)
 
 es = Elasticsearch()
 
 client = pymongo.MongoClient('localhost', 27017)
 db = client.cz4034
-tweets_collection = db.tweets
+parsed_tweets_collection = db.tweets_parsed
 
 es.indices.delete(index='tweets', ignore=[400, 404])
 
-tweets = tweets_collection.find()
+tweets_cursor = parsed_tweets_collection.find()
+total_count = tweets_cursor.count()
 
 id_count = 0
 bulk_count = 0
 index_every = 10000
 tweet_list = []
-print(tweets.count())
 
 f = open('./tweet_mapping.yml')
 # use safe_load instead load
@@ -29,17 +33,22 @@ print(tweet_mapping)
 
 es.create(index='tweets', doc_type='tweet', id=1, ignore=400, body=tweet_mapping)
 
-for tweet in tweets:
+for tweet in tqdm(tweets_cursor, total=total_count):
     try:
-        id_count += 1
-        # bulk_count += 1
-        # tweet_list.append(tweet)
-        res = es.index(index="tweets", doc_type='tweet', id=id_count, body=dumps(tweet))
-        print(id_count)
-    except Exception:
-        pass
-        # if bulk_count > index_every:
-        #     bulk_count = 0
-        #     helpers.bulk(es, tweet_list)
+        bulk_count += 1
+        del tweet['_id']
+        tweet['_type'] = 'tweet'
+        tweet['_index'] = 'tweets'
+        tweet_list.append(tweet)
+        # res = es.index(index="tweets", doc_type='tweet', id=id_count, body=dumps(tweet))
+        if bulk_count >= index_every:
+            helpers.bulk(es, tweet_list)
+            tweet_list = []
+            bulk_count = 0
+    except Exception as e:
+        pp.pprint(tweet)
+        print(e)
+if bulk_count > 0:
+    helpers.bulk(es, tweet_list)
 
 es.indices.refresh(index="tweets")

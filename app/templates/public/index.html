@@ -3,7 +3,6 @@
 {% block sidebar %}
 <div class="section no-pad-bot">
     <div class="container">
-        <br><br>
         <div class="row center">
             <h5 class="header col s12 light">Search for a topic regarding Donald Trump's Govt. planning and
                 decisions</h5>
@@ -17,50 +16,77 @@
                     <i class="material-icons search-icon-close">close</i>
                 </div>
             </div>
-            <br><br>
-            <div class="card card-panel grey lighten-5 z-depth-1">
-                <div class="card-content">
-                    <span class="card-title blue-grey-text text-darken-4"><i class="material-icons">settings</i> Filters</span>
-                    <div class="switch">
-                        <div class="input-field col s12">
-                            <label>
-                                Sarcasm Off
-                                <input type="checkbox" name="sarcasm" value="{{ request.args.get('sarcasm') }}">
-                                <span class="lever"></span>
-                                Sarcasm On
-                            </label>
+            <div class="row">
+                <div class="card card-panel grey lighten-5 z-depth-1">
+                    <div class="card-content">
+                        <span class="card-title blue-grey-text text-darken-4"><i class="material-icons">settings</i> Filters</span>
+                        <div class="row">
+                            <h6 class="col s12 blue-grey-text text-darken-4">Sentiment Analysis</h6>
                         </div>
-                        <br><br><br>
+                        <div class="row">
+                            <div class="switch col s12">
+                                <label>
+                                    {% if (request.args.get('neg')) %}
+                                    <input type="checkbox" name="neg" value="1" checked>
+                                    {% else %}
+                                    <input type="checkbox" name="neg" value="1">
+                                    {% endif %}
+                                    <span class="lever"></span>
+                                    Negative tweets [{{ sentiments_data.neg|default(0) }}]
+                                </label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="switch col s12">
+                                <label>
+                                    {% if (request.args.get('neu')) %}
+                                    <input type="checkbox" name="neu" value="1" checked>
+                                    {% else %}
+                                    <input type="checkbox" name="neu" value="1">
+                                    {% endif %}
+                                    <span class="lever"></span>
+                                    Neutral tweets [{{ sentiments_data.neu|default(0) }}]
+                                </label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="switch col s12">
+                                <label>
+                                    {% if (request.args.get('pos')) %}
+                                    <input type="checkbox" name="pos" value="1" checked>
+                                    {% else %}
+                                    <input type="checkbox" name="pos" value="1">
+                                    {% endif %}
+                                    <span class="lever"></span>
+                                    Positive tweets [{{ sentiments_data.pos|default(0) }}]
+                                </label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12 blue-grey-text text-darken-4">
+                                <input id="date-tweets-from" name="tweets_from"
+                                       value="{{ request.args.get('tweets_from') }}" type="text"
+                                       data-inputmask="'alias': 'dd-mm-yyyy'"
+                                       placeholder="dd-mm-yyyy">
+                                <label for="date-tweets-from">Tweets from</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12 blue-grey-text text-darken-4">
+                                <input id="date-tweets-to" name="tweets_to"
+                                       value="{{ request.args.get('tweets_to') }}" type="text"
+                                       data-inputmask="'alias': 'dd-mm-yyyy'"
+                                       placeholder="dd-mm-yyyy">
+                                <label for="date-tweets-to">Tweets To</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="waves-effect waves-light btn">Submit</button>
                     </div>
-                    <div class="input-field col s12">
-                        <input id="date-tweets-from" name="tweets-from"
-                               value="{{ request.args.get('tweets-from') }}" type="date" class="datepicker">
-                        <label for="date-tweets-from">Tweets from</label>
-                    </div>
-                    <div class="input-field col s12">
-                        <input id="date-tweets-to" name="tweets-to" value="{{ request.args.get('tweets-to') }}"
-                               type="date" class="datepicker">
-                        <label for="date-tweets-to">Tweets To</label>
-                    </div>
-                    <button type="submit" class="waves-effect waves-light btn">Submit</button>
                 </div>
             </div>
         </form>
-        <!--<div class="card card-panel grey lighten-5 z-depth-1 clearfix">-->
-        <!--<div class="card-content">-->
-        <!--<span class="card-title blue-grey-text text-darken-4"><i-->
-        <!--class="material-icons"></i> Quick Search</span>-->
-        <!--<div class="collection">-->
-        <!--<a href="#!" class="collection-item">Immigration</a>-->
-        <!--<a href="#!" class="collection-item">Obamacare</a>-->
-        <!--<a href="#!" class="collection-item">Wall</a>-->
-        <!--</div>-->
-        <!--</div>-->
-        <!--</div>-->
     </div>
 </div>
-<div class="parallax"><img src="{{ url_for('static', filename = 'img/background4.jpg') }}"
-                           alt="Abstract background"></div>
 {% endblock %}
 
 
@@ -70,28 +96,48 @@
         <div class="col s12">
             <div class="search-data">
                 <p class="flow-text">
-                    <span class="right"><small>Page <strong>{{ curr_page }}</strong> out of <strong>{{ number_of_pages }}</strong></small></span>
+                    <span class="right">
+                        <small>{{ tweets['took'] * 0.001|round(2, 'ceil') }} seconds</small>
+                    </span>
                     <small>
-                        <strong>{{ number_of_docs }}</strong> tweets out of
+                        <strong class="number-of-docs">{{ number_of_docs }}</strong> tweets out of
                         <strong>{{ "{:,}".format(tweets['hits']['total']) }}</strong> retrieved
-                        ({{ tweets['took'] * 0.001 }} seconds)
                     </small>
                 </p>
             </div>
             <div class="grid">
                 <div class="grid-sizer"></div>
                 {% for tweet in tweets['hits']['hits'] %}
+                {% if tweet._source.leading_sentiment == "pos" %}
+                {% set sentiment = "Positive" %}
+                {% elif tweet._source.leading_sentiment == "neu" %}
+                {% set sentiment = "Neutral" %}
+                {% else %}
+                {% set sentiment = "Negative" %}
+                {% endif %}
                 <div class="col s12 m6 grid-item">
                     <div class="card card-panel grey lighten-5 z-depth-1">
                         <div class="row valign-wrapper">
-                            <div class="col s1">
+                            <div class="col s2 center">
                                 <img src="{{ tweet._source.user.profile_image_url }}" alt="User profile Image"
                                      class="circle responsive-img">
                                 <!-- notice the "circle" class -->
                             </div>
                             <div class="col s10">
-                                <p class="right">{{ tweet._source.created_at }}</p>
-                                <h5>{{ tweet._source.user.name }}
+                                <p class="right">
+                                    <a href="#" data-position="top" data-delay="50"
+                                       data-tooltip="{{ tweet._source.created_at|datestring_fmt(2) }}"
+                                       class="tooltipped">{{ tweet._source.created_at|datestring_fmt }}</a>
+                                </p>
+                                <h5>
+                                    {% if tweet._source.user.verified %}
+                                    <span class="user-name">{{ tweet._source.user.name }}
+                                    <a href="#" class="tooltipped verified-user" data-position="bottom" data-delay="50"
+                                       data-tooltip="Verified"><i class="material-icons">done</i></a>
+                                    </span>
+                                    {% else %}
+                                    <span>{{ tweet._source.user.name }}</span>
+                                    {% endif %}
                                     <small>@{{ tweet._source.user.screen_name }}</small>
                                 </h5>
                                 <p>{{ tweet._source.text|urlize(40, target='_blank') }}</p>
@@ -104,41 +150,45 @@
                                         tweet._source.favorite_count }}</a>
                                     <a href="#" class="right tooltipped" data-position="bottom" data-delay="50"
                                        data-tooltip="Score"><i class="material-icons">equalizer</i>{{
-                                        tweet._score }}</a>
+                                        tweet._score|round(3, 'ceil') }}</a>
+                                    <a href="#" class="right tooltipped" data-position="bottom" data-delay="50"
+                                       data-tooltip="{{sentiment}} Tweet">
+                                        <i class="material-icons {{tweet._source.leading_sentiment}}">track_changes</i></a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 {% endfor %}
+                <div class='navigation'>
+                    <a href="{{ url_for('public.tweet_search', q=query, page=next_page, size=size, tweets_from=tweets_from, tweets_to=tweets_to, neg=sentiment.neg, neu=sentiment.neu, pos=sentiment.pos) }}"
+                       class='btn'>Next page?</a>
+                </div>
             </div>
-            {% if number_of_pages > 1 %}
-            <div class="col s12">
-                <ul class="pagination center">
-                    {% if curr_page != 1 %}
-                    <li class="waves-effect"><a href="{{ modify_query(page=prev_page) }}"><i
-                            class="material-icons">chevron_left</i></a></li>
-                    {% else %}
-                    <li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
-                    {% endif %}
-
-                    {% for page in page_list %}
-                    {% if page.num == '' %}
-                    <li class="disabled">...</li>
-                    {% else %}
-                    <li class="{{ page.class }}"><a href="{{ modify_query(page=page.num) }}">{{ page.num }}</a></li>
-                    {% endif %}
-                    {% endfor %}
-
-                    {% if curr_page != number_of_pages %}
-                    <li class="waves-effect"><a href="{{ modify_query(page=next_page) }}"><i
-                            class="material-icons">chevron_right</i></a></li>
-                    {% else %}
-                    <li class="disabled"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
-                    {% endif %}
-                </ul>
+        </div>
+    </div>
+    <div class="fixed-action-btn" style="bottom: 45px; right: 24px;">
+        <!-- Modal Trigger -->
+        <a href="#modal1" class="btn-floating btn-large waves-effect waves-light light-blue">
+            <i class="material-icons">assessment</i>
+        </a>
+    </div>
+    <div id="modal1" class="modal bottom-sheet">
+        <div class="modal-content">
+            <h4>Stats for <i>{{ request.args.get('q', 'Donald Tweets') }}</i></h4>
+            <div class="row">
+                <div class="col s4">
+                    <h5>Number of tweets by sentiment</h5>
+                    <canvas id="myChart" height="200"></canvas>
+                </div>
+                <div class="col s8">
+                    <h5>Tweets over time by sentiment</h5>
+                    <canvas id="myChart2" height="100   "></canvas>
+                </div>
             </div>
-            {% endif %}
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
         </div>
     </div>
 </div>
@@ -148,14 +198,117 @@
 <script type="text/javascript">
     $(document).ready(function () {
         Materialize.updateTextFields();
+
+        $(":input").inputmask();
+
+        $('.tooltipped').tooltip();
+
+        $container = $('.grid');
+
+        $container.imagesLoaded(function () {
+            $container.masonry({
+                columnWidth: '.grid-sizer',
+                itemSelector: '.grid-item',
+                percentPosition: true
+            });
+        });
+
+        // Infinite Scroll
+        $container.infinitescroll({
+
+                // selector for the paged navigation (it will be hidden)
+                navSelector: ".navigation",
+                // selector for the NEXT link (to page 2)
+                nextSelector: ".navigation a",
+                // selector for all items you'll retrieve
+                itemSelector: ".grid-item",
+
+                // finished message
+                loading: {
+                    finishedMsg: 'No more tweets!',
+                    msg: $('<div class="preloader-wrapper small active">' +
+                        '<div class="spinner-layer spinner-blue-only">' +
+                        '<div class="circle-clipper left">' +
+                        '<div class="circle"></div>' +
+                        '</div><div class="gap-patch">' +
+                        '<div class="circle"></div>' +
+                        '</div><div class="circle-clipper right">' +
+                        '<div class="circle"></div>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>')
+                }
+            },
+
+            // Trigger Masonry as a callback
+            function (newElements) {
+                // hide new items while they are loading
+                var $newElems = $(newElements).css({opacity: 0});
+                // update number of tweets shown
+                var n_o_d = $('.number-of-docs');
+                var number_of_docs = parseInt(n_o_d.text());
+                console.log(newElements.length);
+                number_of_docs += newElements.length;
+                n_o_d.text(number_of_docs);
+
+                // ensure that images load before adding to masonry layout
+                $newElems.imagesLoaded(function () {
+                    // show elems now they're ready
+                    $newElems.animate({opacity: 1});
+                    $container.masonry('appended', $newElems, true);
+                    $('.tooltipped').tooltip();
+                });
+            });
     });
 
-    $('.tooltipped').tooltip();
+    var data = {
+        labels: [
+            "Negative",
+            "Neutral",
+            "Positive"
+        ],
+        datasets: [
+            {
+                data: [
+                    '{{sentiments_data.neg}}',
+                    '{{sentiments_data.neu}}',
+                    '{{sentiments_data.pos}}'
+                ],
+                backgroundColor: [
+                    "#FF6384",
+                    "#CCCCCC",
+                    "#36A2EB",
+                ],
+                hoverBackgroundColor: [
+                    "#FF6384",
+                    "#CCCCCC",
+                    "#36A2EB",
+                ]
+            }]
+    };
+    // Chart
+    var ctx = $("#myChart");
+    var myChart = new Chart(ctx, {
+        type: 'pie',
+        data: data
+    })
 
-    $('.grid').masonry({
-        columnWidth: '.grid-sizer',
-        itemSelector: '.grid-item',
-        percentPosition: true
+    // Chart
+    var ctx2 = $("#myChart2");
+    var myChart2 = new Chart(ctx2, {
+        type: 'bar',
+        data: {{ sentiment_over_time|safe }},
+        options: {
+            scales: {
+                xAxes: [{stacked: true}],
+                yAxes: [{
+                stacked: true,
+                ticks: {
+                    beginAtZero: true
+                 }
+              }]
+            }
+          }
     });
 
 
